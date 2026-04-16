@@ -90,6 +90,11 @@ public class Hospitalizacion implements GestionHospitalizacion {
 
     @Override
     public void registrarAlta(String fechaAlta) {
+        if (habitacion.isDisponible()) {
+            System.out.println("No hay ningún paciente ingresado en esta habitación.");
+            return;
+        }
+
         this.fechaAlta = fechaAlta;
         this.estado = "Alta";
         habitacion.liberarHabitacion();
@@ -97,6 +102,11 @@ public class Hospitalizacion implements GestionHospitalizacion {
 
     @Override
     public void registrarIngreso(String fechaIngreso, String motivoIngreso) {
+        if (!habitacion.isDisponible()) {
+            System.out.println("La habitación no está disponible.");
+            return;
+        }
+
         this.fechaIngreso = fechaIngreso;
         this.motivoIngreso = motivoIngreso;
         this.estado = "Ingresado";
