@@ -8,98 +8,135 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        Paciente paciente = new Paciente(
-                "María",
-                "López",
-                "P001",
-                "Femenino",
-                28,
-                "8888-9999"
-        );
-
-        Habitacion habitacion = new Habitacion(
-                true,
-                "Privada",
-                "101",
-                "H001"
-        );
-
-        Hospitalizacion hospitalizacion = new Hospitalizacion(
-                "HO001",
-                "",
-                "",
-                "",
-                "Pendiente",
-                paciente,
-                habitacion
-        );
+        Paciente paciente = null;
+        Habitacion habitacion = null;
+        Hospitalizacion hospitalizacion = null;
 
         int opcion;
 
         do {
             System.out.println("\n=== MENÚ DE HOSPITALIZACIÓN ===");
-            System.out.println("1. Mostrar resumen");
-            System.out.println("2. Registrar ingreso");
-            System.out.println("3. Registrar alta");
-            System.out.println("4. Ver estado de habitación");
-            System.out.println("5. Salir");
+            System.out.println("1. Registrar paciente + ingreso + habitación");
+            System.out.println("2. Registrar alta");
+            System.out.println("3. Mostrar resumen");
+            System.out.println("4. Salir");
             System.out.print("Seleccione una opción: ");
-
             opcion = sc.nextInt();
             sc.nextLine();
 
             switch (opcion) {
                 case 1:
-                    System.out.println("\n=== RESUMEN ===");
-                    hospitalizacion.mostrarResumen();
-                    System.out.println("Fecha de ingreso: " + hospitalizacion.getFechaIngreso());
-                    System.out.println("Fecha de alta: " + hospitalizacion.getFechaAlta());
-                    System.out.println("Motivo de ingreso: " + hospitalizacion.getMotivoIngreso());
+                    if (hospitalizacion != null && !hospitalizacion.getHabitacion().isDisponible()) {
+                        System.out.println("Ya hay una hospitalización activa. Primero debe registrarse el alta.");
+                        break;
+                    }
+
+                    System.out.println("\n=== REGISTRO DE PACIENTE ===");
+                    System.out.print("Nombre: ");
+                    String nombre = sc.nextLine();
+
+                    System.out.print("Apellido: ");
+                    String apellido = sc.nextLine();
+
+                    System.out.print("ID del paciente: ");
+                    String idPaciente = sc.nextLine();
+
+                    System.out.print("Sexo: ");
+                    String sexo = sc.nextLine();
+
+                    System.out.print("Edad: ");
+                    int edad = sc.nextInt();
+                    sc.nextLine();
+
+                    System.out.print("Teléfono: ");
+                    String telefono = sc.nextLine();
+
+                    paciente = new Paciente(nombre, apellido, idPaciente, sexo, edad, telefono);
+
+                    System.out.println("\n=== REGISTRO DE HABITACIÓN ===");
+                    System.out.print("ID de la habitación: ");
+                    String idHabitacion = sc.nextLine();
+
+                    System.out.print("Número de habitación: ");
+                    String numeroHabitacion = sc.nextLine();
+
+                    System.out.print("Tipo de habitación: ");
+                    String tipoHabitacion = sc.nextLine();
+
+                    habitacion = new Habitacion(true, tipoHabitacion, numeroHabitacion, idHabitacion);
+
+                    System.out.println("\n=== REGISTRO DE INGRESO ===");
+                    System.out.print("ID de hospitalización: ");
+                    String idHospitalizacion = sc.nextLine();
+
+                    System.out.print("Fecha de ingreso: ");
+                    String fechaIngreso = sc.nextLine();
+
+                    System.out.print("Motivo de ingreso: ");
+                    String motivoIngreso = sc.nextLine();
+
+                    hospitalizacion = new Hospitalizacion(
+                            idHospitalizacion,
+                            "",
+                            "",
+                            "",
+                            "Pendiente",
+                            paciente,
+                            habitacion
+                    );
+
+                    hospitalizacion.registrarIngreso(fechaIngreso, motivoIngreso);
+                    System.out.println("Paciente, habitación e ingreso registrados con éxito.");
                     break;
 
                 case 2:
-                    if (!habitacion.isDisponible()) {
-                        System.out.println("No se puede registrar ingreso porque la habitación ya está ocupada.");
-                    } else {
-                        System.out.print("Ingrese la fecha de ingreso: ");
-                        String fechaIngreso = sc.nextLine();
-
-                        System.out.print("Ingrese el motivo de ingreso: ");
-                        String motivoIngreso = sc.nextLine();
-
-                        hospitalizacion.registrarIngreso(fechaIngreso, motivoIngreso);
-                        System.out.println("Ingreso registrado con éxito.");
-                    }
-                    break;
-
-                case 3:
-                    if (habitacion.isDisponible()) {
-                        System.out.println("No se puede registrar alta porque no hay un paciente ingresado.");
+                    if (hospitalizacion == null || hospitalizacion.getHabitacion().isDisponible()) {
+                        System.out.println("No hay ninguna hospitalización activa.");
                     } else {
                         System.out.print("Ingrese la fecha de alta: ");
                         String fechaAlta = sc.nextLine();
-
                         hospitalizacion.registrarAlta(fechaAlta);
                         System.out.println("Alta registrada con éxito.");
                     }
                     break;
 
-                case 4:
-                    System.out.println("\n=== ESTADO DE HABITACIÓN ===");
-                    System.out.println("Número: " + habitacion.getNumero());
-                    System.out.println("Tipo: " + habitacion.getTipo());
-                    System.out.println("Disponible: " + (habitacion.isDisponible() ? "Sí" : "No"));
+                case 3:
+                    if (hospitalizacion == null) {
+                        System.out.println("No hay hospitalización registrada.");
+                    } else {
+                        System.out.println("\n=== RESUMEN ===");
+                        System.out.println("ID Hospitalización: " + hospitalizacion.getIdHospitalizacion());
+                        System.out.println("Estado: " + hospitalizacion.getEstado());
+                        System.out.println("Fecha de ingreso: " + hospitalizacion.getFechaIngreso());
+                        System.out.println("Fecha de alta: " + hospitalizacion.getFechaAlta());
+                        System.out.println("Motivo de ingreso: " + hospitalizacion.getMotivoIngreso());
+
+                        System.out.println("\n--- Paciente ---");
+                        System.out.println("Nombre: " + hospitalizacion.getPaciente().getNombre() + " " +
+                                hospitalizacion.getPaciente().getApellido());
+                        System.out.println("ID: " + hospitalizacion.getPaciente().getIdPaciente());
+                        System.out.println("Sexo: " + hospitalizacion.getPaciente().getSexo());
+                        System.out.println("Edad: " + hospitalizacion.getPaciente().getEdad());
+                        System.out.println("Teléfono: " + hospitalizacion.getPaciente().getTelefono());
+
+                        System.out.println("\n--- Habitación ---");
+                        System.out.println("ID: " + hospitalizacion.getHabitacion().getIdHabitacion());
+                        System.out.println("Número: " + hospitalizacion.getHabitacion().getNumero());
+                        System.out.println("Tipo: " + hospitalizacion.getHabitacion().getTipo());
+                        System.out.println("Disponible: " +
+                                (hospitalizacion.getHabitacion().isDisponible() ? "Sí" : "No"));
+                    }
                     break;
 
-                case 5:
+                case 4:
                     System.out.println("Saliendo del sistema...");
                     break;
 
                 default:
-                    System.out.println("Opción inválida. Intente de nuevo.");
+                    System.out.println("Opción inválida.");
             }
 
-        } while (opcion != 5);
+        } while (opcion != 4);
 
         sc.close();
     }
